@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter/ffmpeg_kit_config.dart';
-import 'package:ffmpeg_kit_flutter/return_code.dart';
+import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit_config.dart';
+import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'package:path/path.dart';
 
 import 'package:flutter/material.dart';
@@ -78,8 +78,9 @@ class Trimmer {
     }
 
     // Directory + folder name
-    final Directory directoryFolder =
-        Directory('${directory!.path}/$folderName/');
+    final Directory directoryFolder = Directory(
+      '${directory!.path}/$folderName/',
+    );
 
     if (await directoryFolder.exists()) {
       // If folder already exists return path
@@ -88,8 +89,9 @@ class Trimmer {
     } else {
       debugPrint('Creating');
       // If folder does not exists create folder and then return its path
-      final Directory directoryNewFolder =
-          await directoryFolder.create(recursive: true);
+      final Directory directoryNewFolder = await directoryFolder.create(
+        recursive: true,
+      );
       return directoryNewFolder.path;
     }
   }
@@ -184,11 +186,12 @@ class Trimmer {
     String command;
 
     // Formatting Date and Time
-    String dateTime = DateFormat.yMMMd()
-        .addPattern('-')
-        .add_Hms()
-        .format(DateTime.now())
-        .toString();
+    String dateTime =
+        DateFormat.yMMMd()
+            .addPattern('-')
+            .add_Hms()
+            .format(DateTime.now())
+            .toString();
 
     // String _resultString;
     String outputPath;
@@ -207,9 +210,7 @@ class Trimmer {
     String path = await _createFolderInAppDocDir(
       audioFolderName,
       storageDir,
-    ).whenComplete(
-      () => debugPrint("Retrieved Trimmer folder"),
-    );
+    ).whenComplete(() => debugPrint("Retrieved Trimmer folder"));
 
     Duration startPoint = Duration(milliseconds: startValue.toInt());
     Duration endPoint = Duration(milliseconds: endValue.toInt());
@@ -246,8 +247,9 @@ class Trimmer {
     command += '"$outputPath"';
 
     FFmpegKit.executeAsync(command, (session) async {
-      final state =
-          FFmpegKitConfig.sessionStateToString(await session.getState());
+      final state = FFmpegKitConfig.sessionStateToString(
+        await session.getState(),
+      );
       final returnCode = await session.getReturnCode();
 
       debugPrint("FFmpeg process exited with state $state and rc $returnCode");
