@@ -11,7 +11,11 @@ dependencies:
     sdk: flutter
 
   audioplayers: ^5.2.0
-  ffmpeg_kit_flutter_new: ^2.0.0
+  # ffmpeg_kit_flutter_new: ^2.0.0
+  ffmpeg_kit_flutter_new:
+    git:
+      url: https://github.com/MorningStarJ/ffmpeg_kit_flutter_new.git
+      ref: master
   intl: ^0.20.1
   path: ^1.8.2
   path_provider: ^2.0.11
