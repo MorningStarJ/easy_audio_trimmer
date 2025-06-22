@@ -331,24 +331,7 @@ class Trimmer {
     command += '"$outputPath"';
     debugPrint("execute command: $command");
 
-    return await FFmpegKit.executeAsync(command, (session) async {
-      final state = FFmpegKitConfig.sessionStateToString(
-        await session.getState(),
-      );
-      final returnCode = await session.getReturnCode();
-
-      debugPrint("FFmpeg process exited with state $state and rc $returnCode");
-
-      if (ReturnCode.isSuccess(returnCode)) {
-        debugPrint("FFmpeg processing completed successfully.");
-        debugPrint('Audio successfully saved');
-      } else {
-        debugPrint("FFmpeg processing failed.");
-        debugPrint('Couldn\'t save the audio');
-      }
-    });
-
-    // return _outputPath;
+    return await FFmpegKit.execute(command);
   }
 
   /// For getting the audio controller state, to know whether the
