@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit_config.dart';
+import 'package:ffmpeg_kit_flutter_new/ffmpeg_session.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'package:path/path.dart';
 
@@ -262,6 +263,88 @@ class Trimmer {
         debugPrint("FFmpeg processing failed.");
         debugPrint('Couldn\'t save the audio');
         onSave(null);
+      }
+    });
+
+    // return _outputPath;
+  }
+
+  Future<FFmpegSession> trimmedAudioFile({
+    required double startValue,
+    required double endValue,
+    required String destinationPath,
+    bool applyAudioEncoding = false,
+    FileFormat? outputFormat,
+    String? ffmpegCommand,
+    String? customAudioFormat,
+    int? fpsGIF,
+    int? scaleGIF,
+  }) async {
+    final String audioPath = currentAudioFile!.path;
+    String command;
+
+    // Formatting Date and Time
+    String dateTime =
+        DateFormat.yMMMd()
+            .addPattern('-')
+            .add_Hms()
+            .format(DateTime.now())
+            .toString();
+
+    String? outputFormatString;
+    String formattedDateTime = dateTime.replaceAll(' ', '');
+
+    debugPrint("DateTime: $dateTime");
+    debugPrint("Formatted: $formattedDateTime");
+    String outputPath = destinationPath.replaceAll(' ', '_');
+
+    Duration startPoint = Duration(milliseconds: startValue.toInt());
+    Duration endPoint = Duration(milliseconds: endValue.toInt());
+
+    // Checking the start and end point strings
+    debugPrint("Start: ${startPoint.toString()} & End: ${endPoint.toString()}");
+
+    debugPrint(outputPath);
+
+    if (outputFormat == null) {
+      outputFormat = FileFormat.mp3;
+      outputFormatString = outputFormat.toString();
+      debugPrint('OUTPUT: $outputFormatString');
+    } else {
+      outputFormatString = outputFormat.toString();
+    }
+
+    String trimLengthCommand =
+        ' -ss $startPoint -i "$audioPath" -t ${endPoint - startPoint}';
+
+    if (ffmpegCommand == null) {
+      command = '$trimLengthCommand -c:a copy ';
+
+      if (!applyAudioEncoding) {
+        command += '-c:v copy ';
+      }
+    } else {
+      command = '$trimLengthCommand $ffmpegCommand ';
+      outputFormatString = customAudioFormat;
+    }
+
+    command += '"$outputPath"';
+    debugPrint("execute command: $command");
+
+    return await FFmpegKit.executeAsync(command, (session) async {
+      final state = FFmpegKitConfig.sessionStateToString(
+        await session.getState(),
+      );
+      final returnCode = await session.getReturnCode();
+
+      debugPrint("FFmpeg process exited with state $state and rc $returnCode");
+
+      if (ReturnCode.isSuccess(returnCode)) {
+        debugPrint("FFmpeg processing completed successfully.");
+        debugPrint('Audio successfully saved');
+      } else {
+        debugPrint("FFmpeg processing failed.");
+        debugPrint('Couldn\'t save the audio');
       }
     });
 
